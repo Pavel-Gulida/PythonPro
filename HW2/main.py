@@ -6,38 +6,23 @@ import csv
 app = Flask(__name__)
 @app.route("/generate_password")
 def generate_password():
-    ascii_lowercase = string.ascii_lowercase
-    ascii_uppercase = string.ascii_uppercase
-    digit = string.digits
-    special_symbols = string.punctuation
-    str = string.ascii_letters + digit
+    str = string.ascii_letters + string.digits
     len = random.randint(10, 20)
 
-    result = ""
-    result += random.choice(ascii_uppercase)
-    result += random.choice(ascii_lowercase)
-    result += random.choice(special_symbols)
-    result += random.choice(digit)
-    for _ in range(len -4):
+    result = random.choice(string.ascii_uppercase) + random.choice(string.ascii_lowercase)
+    result += random.choice(string.punctuation) + random.choice(string.digits)
+    for _ in range(len - 4):
         result += random.choice(str)
-    result1 = ""
-    for i in range(len):
-        ch = random.choice(result)
-        result1 += ch
-        j = result.find(ch)
-        result = result[:j] + result[j+1:]
 
-    return  "Password: " + result1
+    result = list(result)
+    random.shuffle(result)
+    result = "".join(result)
+
+    return  f"Password: {result}"
 
 @app.route("/calculate_average")
 def calculate_average():
-    """
-    csv file with students
-    1.calculate average high
-    2.calculate average weight
-    csv - use lib
-    *pandas - use pandas for calculating
-    """
+
     with open('hw.csv', "r") as csvfile:
         reader = csv.DictReader(csvfile)
         average_high = 0
