@@ -1,6 +1,6 @@
 from flask import Flask
 from webargs.flaskparser import use_kwargs
-from webargs import fields
+from webargs import validate, fields
 import requests
 from faker import Faker
 import csv
@@ -8,14 +8,23 @@ import csv
 app = Flask(__name__)
 
 @app.route("/generate_students")
-def generate_students():
+@use_kwargs(
+    {
+        "count" : fields.Int(
+            missing = 30,
+            validate = [validate.Range(max=100)]
+        )
+    },
+    location="query"
+)
+def generate_students(count):
     fake = Faker()
-    with open("csvfile", "w", newline="") as csvfile:
+    with open("csvfile", "w",  newline="") as csvfile:
          writer = csv.DictWriter(csvfile,
             fieldnames= ["first_name","last_name","email","password","birthday"])
          writer.writeheader()
-
-         for _ in range(1000):
+         result = ""
+         for _ in range(count):
             student = dict()
             student["first_name"] = fake.first_name()
             student["last_name"] = fake.last_name()
@@ -23,9 +32,8 @@ def generate_students():
             student["password"] = fake.password()
             student["birthday"] = fake.date_of_birth(minimum_age=18, maximum_age=60)
             writer.writerow(student)
-            
-    with open("csvfile", "r") as csvfile:
-        return csvfile.read().replace("\n","<p>")
+            result += str(student) + "<p>"
+         return result.replace("}","").replace("{","").replace("'","")
 
 @app.route("/bitcoin_rate")
 @use_kwargs(
@@ -40,15 +48,12 @@ def generate_students():
     location="query"
 )
 def get_bitcoin_value(currency, convert):
-    rates = requests.get("https://bitpay.com/api/rates", params={}).json()
-    currencies = requests.get("https://test.bitpay.com/currencies", params={}).json()
-    result = 0
-    for d in rates:
-        if d["code"] == currency:
-            result = round(d["rate"] * convert, 2)
-    for d in currencies["data"]:
-        if d["code"] == currency:
-            currency += f" ({d["symbol"]})"
+    rates = requests.get(f"https://bitpay.com/api/rates/{currency}", params={}).json()
+    currencies = requests.get(f"https://test.bitpay.com/currencies", params={}).json()
+    result = round(rates["rate"] * convert, 2)
+    for row in currencies["data"]:
+        if row["code"] == currency:
+            currency += f" ({row["symbol"]})"
 
     return f"{result} {currency} to buy {convert} Bitcoin"
 
