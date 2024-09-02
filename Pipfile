@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==4.2.15"
+faker = "*"
+ipython = "*"
+django-extensions = "*"
+webargs = "*"
+
+
+[dev-packages]
+flake8 = "*"
+black = "*"
+
+[requires]
+python_version = "3.12"
+python_full_version = "3.12.2"

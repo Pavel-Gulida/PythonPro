@@ -50,3 +50,22 @@ assert(list(frange(100, 0)) == [])
 
 
 print('SUCCESS!')
+
+print('\033[93m', end='')
+print('aaa')
+print('bbb')
+print('\033[0m', end='')
+print('ccc')
+
+class colorizer:
+    def __init__(self, color="default"):
+        self.colors = {'red':'\033[91m', 'default':'\033[0m'}
+        self.color = color
+    def __enter__(self):
+        print(self.colors[self.color], end="")
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        print(self.colors['default'], end="")
+
+with colorizer('red'):
+    print('printed in red')
+print('printed in default color')
