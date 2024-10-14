@@ -7,7 +7,8 @@ def task(l):
         if(l[i] > top):
             top = l[i]
         if (l[i] == top):
-            depth=local_depth
+            if(local_depth > depth):
+                depth = local_depth
         if(top - l[i] > local_depth):
             local_depth = top - l[i]
     return depth
